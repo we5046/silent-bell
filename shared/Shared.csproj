@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <RootNamespace>SilentBell.Shared</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.36.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.84.0" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- 생성 파일을 shared/Generated에 두고 커밋한다. Unity(M2)가 같은 소스를 쓰기 때문이다. -->
+    <Protobuf Include="../proto/packets.proto" OutputDir="Generated" CompileOutputs="false" GrpcServices="None" />
+  </ItemGroup>
+</Project>
