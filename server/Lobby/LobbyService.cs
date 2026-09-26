@@ -38,6 +38,9 @@ public sealed class LobbyService
             case C_CreateRoom: CreateRoom(player); break;
             case C_JoinRoom join: JoinRoom(player, join.Code); break;
             case C_LeaveRoom: LeaveRoom(player); break;
+            case C_PickClass pick: PickClass(player, pick.ClassType, pick.Gender); break;
+            case C_Ready ready: SetReady(player, ready.Ready); break;
+            case C_StartGame: StartGame(player); break;
         }
     }
 
@@ -117,6 +120,78 @@ public sealed class LobbyService
         RemoveFromRoom(player);
         _send(player.Id, new S_RoomState()); // 빈 코드 = 방에 없음
     }
+
+    void PickClass(Player player, ClassType classType, Gender gender)
+    {
+        var room = WaitingRoomOf(player);
+        if (room == null) return;
+        if (classType == ClassType.None || !Enum.IsDefined(classType) || !Enum.IsDefined(gender))
+        {
+            Error(player.Id, ErrorCode.InvalidRequest);
+            return;
+        }
+        if (room.Members.Any(m => m.PlayerId != player.Id && m.ClassType == classType))
+        {
+            Error(player.Id, ErrorCode.ClassTaken);
+            return;
+        }
+        var me = MemberOf(room, player);
+        me.ClassType = classType;
+        me.Gender = gender;
+        me.Ready = false; // 클래스를 바꾸면 준비가 풀린다
+        Broadcast(room);
+    }
+
+    void SetReady(Player player, bool ready)
+    {
+        var room = WaitingRoomOf(player);
+        if (room == null) return;
+        var me = MemberOf(room, player);
+        if (ready && me.ClassType == ClassType.None)
+        {
+            Error(player.Id, ErrorCode.ClassNotPicked);
+            return;
+        }
+        me.Ready = ready;
+        Broadcast(room);
+    }
+
+    void StartGame(Player player)
+    {
+        var room = WaitingRoomOf(player);
+        if (room == null) return;
+        if (room.HostId != player.Id)
+        {
+            Error(player.Id, ErrorCode.NotHost);
+            return;
+        }
+        if (room.Members.Count < MinStartPlayers || room.Members.Any(m => m.ClassType == ClassType.None || !m.Ready))
+        {
+            Error(player.Id, ErrorCode.StartConditionNotMet);
+            return;
+        }
+        room.InGame = true;
+        var start = new S_GameStart();
+        foreach (var m in room.Members) _send(m.PlayerId, start);
+    }
+
+    // 대기 중인 방에 있으면 그 방을, 아니면 오류를 보내고 null
+    Room? WaitingRoomOf(Player player)
+    {
+        if (player.Room == null)
+        {
+            Error(player.Id, ErrorCode.NotInRoom);
+            return null;
+        }
+        if (player.Room.InGame)
+        {
+            Error(player.Id, ErrorCode.RoomInGame);
+            return null;
+        }
+        return player.Room;
+    }
+
+    static Member MemberOf(Room room, Player player) => room.Members.First(m => m.PlayerId == player.Id);
 
     void AddMember(Room room, Player player)
     {

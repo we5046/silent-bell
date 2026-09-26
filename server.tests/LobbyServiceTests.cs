@@ -162,4 +162,117 @@ public class LobbyServiceTests
         Login(3, "player1");
         Assert.True(Last<S_LoginResult>(3).Ok);
     }
+
+    void Pick(int id, ClassType classType, Gender gender = Gender.Male) =>
+        _lobby.Handle(id, new C_PickClass { ClassType = classType, Gender = gender });
+
+    void Ready(int id, bool ready = true) =>
+        _lobby.Handle(id, new C_Ready { Ready = ready });
+
+    string ReadyRoomOfTwo()
+    {
+        var code = CreateRoom(1);
+        Join(2, code);
+        Pick(1, ClassType.Warrior);
+        Ready(1);
+        Pick(2, ClassType.Bard);
+        Ready(2);
+        return code;
+    }
+
+    [Fact]
+    public void PickClass_sets_class_and_gender()
+    {
+        CreateRoom(1);
+        Pick(1, ClassType.Bard, Gender.Female);
+        var slot = Last<S_RoomState>(1).Slots.Single();
+        Assert.Equal(ClassType.Bard, slot.ClassType);
+        Assert.Equal(Gender.Female, slot.Gender);
+    }
+
+    [Fact]
+    public void PickClass_taken_by_other_member_returns_error()
+    {
+        var code = CreateRoom(1);
+        Join(2, code);
+        Pick(1, ClassType.Warrior);
+        Pick(2, ClassType.Warrior);
+        Assert.Equal(ErrorCode.ClassTaken, Last<S_Error>(2).Code);
+    }
+
+    [Fact]
+    public void PickClass_none_returns_error()
+    {
+        CreateRoom(1);
+        Pick(1, ClassType.None);
+        Assert.Equal(ErrorCode.InvalidRequest, Last<S_Error>(1).Code);
+    }
+
+    [Fact]
+    public void Changing_class_clears_ready()
+    {
+        CreateRoom(1);
+        Pick(1, ClassType.Mage);
+        Ready(1);
+        Pick(1, ClassType.Archer);
+        Assert.False(Last<S_RoomState>(1).Slots.Single().Ready);
+    }
+
+    [Fact]
+    public void Ready_without_class_returns_error()
+    {
+        CreateRoom(1);
+        Ready(1);
+        Assert.Equal(ErrorCode.ClassNotPicked, Last<S_Error>(1).Code);
+    }
+
+    [Fact]
+    public void Start_by_non_host_returns_error()
+    {
+        ReadyRoomOfTwo();
+        _lobby.Handle(2, new C_StartGame());
+        Assert.Equal(ErrorCode.NotHost, Last<S_Error>(2).Code);
+    }
+
+    [Fact]
+    public void Start_alone_returns_error()
+    {
+        CreateRoom(1);
+        Pick(1, ClassType.Warrior);
+        Ready(1);
+        _lobby.Handle(1, new C_StartGame());
+        Assert.Equal(ErrorCode.StartConditionNotMet, Last<S_Error>(1).Code);
+    }
+
+    [Fact]
+    public void Start_with_unready_member_returns_error()
+    {
+        ReadyRoomOfTwo();
+        Ready(2, false);
+        _lobby.Handle(1, new C_StartGame());
+        Assert.Equal(ErrorCode.StartConditionNotMet, Last<S_Error>(1).Code);
+    }
+
+    [Fact]
+    public void Start_sends_game_start_to_all_and_locks_room()
+    {
+        var code = ReadyRoomOfTwo();
+        _lobby.Handle(1, new C_StartGame());
+
+        Assert.NotNull(Last<S_GameStart>(1));
+        Assert.NotNull(Last<S_GameStart>(2));
+        Join(3, code);
+        Assert.Equal(ErrorCode.RoomInGame, Last<S_Error>(3).Code);
+    }
+
+    [Fact]
+    public void Disconnect_releases_class()
+    {
+        var code = CreateRoom(1);
+        Join(2, code);
+        Pick(2, ClassType.Archer);
+        _lobby.OnDisconnect(2);
+        Pick(1, ClassType.Archer);
+        Assert.Equal(ClassType.Archer, Last<S_RoomState>(1).Slots.Single().ClassType);
+    }
 }
