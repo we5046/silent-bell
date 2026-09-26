@@ -58,4 +58,13 @@ public class GameServerTests : IAsyncLifetime
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => notStarted.RunAsync(cts.Token).WaitAsync(TimeSpan.FromSeconds(3)));
     }
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(4)]
+    public async Task Bot_scenario_starts_game(int count)
+    {
+        var code = await BotScenario.RunAsync("127.0.0.1", _server.Port, count);
+        Assert.Matches("^[A-HJ-NP-Z2-9]{4}$", code);
+    }
 }

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>SilentBell.Bot</RootNamespace>
     <AssemblyName>silent-bell-bot</AssemblyName>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\shared\Shared.csproj" />
