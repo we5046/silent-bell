@@ -39,7 +39,7 @@ namespace SilentBell.Protocol {
             "ZRITCg9DTEFTU19UWVBFX05PTkUQABIWChJDTEFTU19UWVBFX1dBUlJJT1IQ",
             "ARITCg9DTEFTU19UWVBFX01BR0UQAhIVChFDTEFTU19UWVBFX0FSQ0hFUhAD",
             "EhMKD0NMQVNTX1RZUEVfQkFSRBAEKiwKBkdlbmRlchIPCgtHRU5ERVJfTUFM",
-            "RRAAEhEKDUdFTkRFUl9GRU1BTEUQASrQAwoJRXJyb3JDb2RlEhMKD0VSUk9S",
+            "RRAAEhEKDUdFTkRFUl9GRU1BTEUQASruAwoJRXJyb3JDb2RlEhMKD0VSUk9S",
             "X0NPREVfTk9ORRAAEh8KG0VSUk9SX0NPREVfTklDS05BTUVfSU5WQUxJRBAB",
             "Eh0KGUVSUk9SX0NPREVfTklDS05BTUVfVEFLRU4QAhIcChhFUlJPUl9DT0RF",
             "X05PVF9MT0dHRURfSU4QAxIgChxFUlJPUl9DT0RFX0FMUkVBRFlfTE9HR0VE",
@@ -49,8 +49,9 @@ namespace SilentBell.Protocol {
             "REVfTk9UX0lOX1JPT00QCRIeChpFUlJPUl9DT0RFX0lOVkFMSURfUkVRVUVT",
             "VBAKEhoKFkVSUk9SX0NPREVfQ0xBU1NfVEFLRU4QCxIfChtFUlJPUl9DT0RF",
             "X0NMQVNTX05PVF9QSUNLRUQQDBIXChNFUlJPUl9DT0RFX05PVF9IT1NUEA0S",
-            "JgoiRVJST1JfQ09ERV9TVEFSVF9DT05ESVRJT05fTk9UX01FVBAOQhaqAhNT",
-            "aWxlbnRCZWxsLlByb3RvY29sYgZwcm90bzM="));
+            "JgoiRVJST1JfQ09ERV9TVEFSVF9DT05ESVRJT05fTk9UX01FVBAOEhwKGEVS",
+            "Uk9SX0NPREVfQUxSRUFEWV9SRUFEWRAPQhaqAhNTaWxlbnRCZWxsLlByb3Rv",
+            "Y29sYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SilentBell.Protocol.ClassType), typeof(global::SilentBell.Protocol.Gender), typeof(global::SilentBell.Protocol.ErrorCode), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -101,6 +102,7 @@ namespace SilentBell.Protocol {
     [pbr::OriginalName("ERROR_CODE_CLASS_NOT_PICKED")] ClassNotPicked = 12,
     [pbr::OriginalName("ERROR_CODE_NOT_HOST")] NotHost = 13,
     [pbr::OriginalName("ERROR_CODE_START_CONDITION_NOT_MET")] StartConditionNotMet = 14,
+    [pbr::OriginalName("ERROR_CODE_ALREADY_READY")] AlreadyReady = 15,
   }
 
   #endregion

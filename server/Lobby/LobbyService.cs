@@ -130,15 +130,19 @@ public sealed class LobbyService
             Error(player.Id, ErrorCode.InvalidRequest);
             return;
         }
+        var me = MemberOf(room, player);
+        if (me.Ready)
+        {
+            Error(player.Id, ErrorCode.AlreadyReady); // 준비 중에는 캐릭터를 바꿀 수 없다. 먼저 준비를 해제해야 한다
+            return;
+        }
         if (room.Members.Any(m => m.PlayerId != player.Id && m.ClassType == classType))
         {
             Error(player.Id, ErrorCode.ClassTaken);
             return;
         }
-        var me = MemberOf(room, player);
         me.ClassType = classType;
         me.Gender = gender;
-        me.Ready = false; // 클래스를 바꾸면 준비가 풀린다
         Broadcast(room);
     }
 

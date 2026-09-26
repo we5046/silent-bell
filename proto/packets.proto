@@ -30,6 +30,7 @@ enum ErrorCode {
   ERROR_CODE_CLASS_NOT_PICKED = 12;
   ERROR_CODE_NOT_HOST = 13;
   ERROR_CODE_START_CONDITION_NOT_MET = 14;
+  ERROR_CODE_ALREADY_READY = 15;
 }
 
 message C_Login { string nickname = 1; }

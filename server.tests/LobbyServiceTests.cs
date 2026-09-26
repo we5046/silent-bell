@@ -209,13 +209,44 @@ public class LobbyServiceTests
     }
 
     [Fact]
-    public void Changing_class_clears_ready()
+    public void PickClass_while_ready_returns_error_and_keeps_character()
     {
         CreateRoom(1);
         Pick(1, ClassType.Mage);
         Ready(1);
-        Pick(1, ClassType.Archer);
-        Assert.False(Last<S_RoomState>(1).Slots.Single().Ready);
+        Pick(1, ClassType.Archer, Gender.Female);
+
+        Assert.Equal(ErrorCode.AlreadyReady, Last<S_Error>(1).Code);
+        var slot = Last<S_RoomState>(1).Slots.Single();
+        Assert.Equal(ClassType.Mage, slot.ClassType);
+        Assert.Equal(Gender.Male, slot.Gender);
+        Assert.True(slot.Ready);
+    }
+
+    [Fact]
+    public void PickClass_after_unready_succeeds()
+    {
+        CreateRoom(1);
+        Pick(1, ClassType.Mage);
+        Ready(1);
+        Ready(1, false);
+        Pick(1, ClassType.Archer, Gender.Female);
+
+        var slot = Last<S_RoomState>(1).Slots.Single();
+        Assert.Equal(ClassType.Archer, slot.ClassType);
+        Assert.Equal(Gender.Female, slot.Gender);
+        Assert.False(slot.Ready);
+    }
+
+    [Fact]
+    public void Repicking_own_class_with_other_gender_succeeds()
+    {
+        var code = CreateRoom(1);
+        Join(2, code);
+        Pick(1, ClassType.Warrior);
+        Pick(1, ClassType.Warrior, Gender.Female);
+
+        Assert.Equal(Gender.Female, Last<S_RoomState>(1).Slots.First(s => s.PlayerId == 1).Gender);
     }
 
     [Fact]
