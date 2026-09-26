@@ -303,6 +303,18 @@ public class LobbyServiceTests
         Assert.Equal(ErrorCode.RoomInGame, Last<S_Error>(3).Code);
     }
 
+    [Theory]
+    [InlineData(99, 0)]
+    [InlineData(1, 5)]
+    public void PickClass_rejects_undefined_enum_values(int classType, int gender)
+    {
+        CreateRoom(1);
+        Pick(1, (ClassType)classType, (Gender)gender);
+
+        Assert.Equal(ErrorCode.InvalidRequest, Last<S_Error>(1).Code);
+        Assert.Equal(ClassType.None, Last<S_RoomState>(1).Slots.Single().ClassType);
+    }
+
     [Fact]
     public void Disconnect_releases_class()
     {

@@ -46,7 +46,17 @@ public sealed class GameServer
                     await Task.Delay(100, ct); // 계속 실패하는 경우 로그 폭주를 막는다
                     continue;
                 }
-                socket.NoDelay = true; // 작은 패킷을 모아 늦게 보내는 Nagle 알고리즘을 끈다
+                try
+                {
+                    socket.NoDelay = true; // 작은 패킷을 모아 늦게 보내는 Nagle 알고리즘을 끈다
+                }
+                catch (SocketException e)
+                {
+                    // 접속 하나의 설정 실패(연결 직후 끊김 등). 이 소켓만 버리고 다음 접속을 받는다.
+                    Log.Warn("accept", $"socket setup failed, dropping connection: {e.SocketErrorCode} {e.Message}");
+                    socket.Dispose();
+                    continue;
+                }
                 var session = new Session(Interlocked.Increment(ref _nextSessionId), socket);
                 _sessions[session.Id] = session;
                 Log.Info("session", $"{session.Id} connected {socket.RemoteEndPoint}");
@@ -67,10 +77,21 @@ public sealed class GameServer
 
     async Task RunSessionAsync(Session session, CancellationToken ct)
     {
-        await session.RunAsync((s, message) => _lobbyQueue.Push(() => _lobby.Handle(s.Id, message)), ct);
-        _sessions.TryRemove(session.Id, out _);
-        _lobbyQueue.Push(() => _lobby.OnDisconnect(session.Id));
-        Log.Info("session", $"{session.Id} disconnected");
+        try
+        {
+            await session.RunAsync((s, message) => _lobbyQueue.Push(() => _lobby.Handle(s.Id, message)), ct);
+        }
+        catch (Exception e)
+        {
+            // Session.RunAsync는 예상한 예외를 스스로 처리한다. 여기까지 오면 버그이므로 기록만 하고 정리는 반드시 한다.
+            Log.Error("session", $"{session.Id} unexpected failure: {e}");
+        }
+        finally
+        {
+            _sessions.TryRemove(session.Id, out _);
+            _lobbyQueue.Push(() => _lobby.OnDisconnect(session.Id));
+            Log.Info("session", $"{session.Id} disconnected");
+        }
     }
 
     void SendTo(int sessionId, IMessage message)
