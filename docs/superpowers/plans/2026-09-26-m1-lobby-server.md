@@ -1499,7 +1499,14 @@ public sealed class Session
         {
             _sendQueue.Writer.TryComplete();
             _socket.Close();
-            try { await sendTask; } catch { /* 소켓을 닫았으므로 남은 송신 실패는 무시 */ }
+            try
+            {
+                await sendTask;
+            }
+            catch (Exception e) when (e is SocketException or ObjectDisposedException or OperationCanceledException)
+            {
+                // 소켓을 방금 닫았으므로 남아 있던 송신이 이 예외들로 끝나는 것은 정상이다
+            }
         }
     }
 
