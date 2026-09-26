@@ -1,14 +1,12 @@
 # M1: 로비 서버 구현 계획
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** TCP로 접속한 클라이언트가 로그인하고, 방을 만들거나 방 코드로 참가하고, 클래스를 골라 준비한 뒤 방장이 게임을 시작할 수 있는 C# 로비 서버와, 이를 자동으로 검증하는 봇을 만든다.
 
 **Architecture:** `proto/packets.proto`에서 Protobuf C# 코드를 생성해 `shared/`(.NET Standard 2.1)에 두고, 패킷 조립(길이 헤더)과 패킷 ID 표도 `shared/`에 둔다. 서버는 세션마다 async 수신 루프와 송신 큐를 두고, 받은 패킷을 로비 잡 큐에 넣는다. 로비 규칙(`LobbyService`)은 잡 큐 한 흐름에서만 실행되므로 락이 없고, 소켓 없이 단위 테스트한다.
 
 **Tech Stack:** .NET 10 SDK(10.0.400), C#, `System.Net.Sockets`, `System.Threading.Channels`, Google.Protobuf 3.36.2, Grpc.Tools 2.84.0(protoc 코드 생성만), xUnit 2.9.3
 
-**설계 문서:** `docs/superpowers/specs/2026-09-26-coop-dungeon-design.md` (2절, 2-1절, 4-1절, 4-2절, 4-3절, 5절)
+**설계 문서:** `docs/specs/2026-09-26-coop-dungeon-design.md` (2절, 2-1절, 4-1절, 4-2절, 4-3절, 5절)
 
 ## Global Constraints
 
@@ -20,6 +18,12 @@
 - 닉네임은 앞뒤 공백을 제거한 뒤 2~12자이고, 접속 중인 닉네임과 같으면 거절한다.
 - 방 코드는 `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`에서 뽑은 4글자다. 참가할 때는 대소문자를 구분하지 않는다.
 - 방 최대 인원은 4명이다. 시작 조건은 2명 이상, 전원 클래스 선택과 준비 완료, 방장만 가능이다.
+- 준비 상태에서는 클래스·성별을 바꿀 수 없다. 준비 상태에서 온 `C_PickClass`는 `ErrorCode.AlreadyReady`(proto 값 15)로 거절한다. (Task 4 리뷰 후 결정, 2026-09-26)
+- `S_LoginResult`는 성공 전용이다(`player_id = 2`, 필드 1·3은 reserved). 로그인 실패를 포함한 모든 거절은 `S_Error`로 보낸다. (Task 5 리뷰 후 결정)
+- Accept 루프: 접속 하나의 `SocketException`은 WARN 로그 후 100ms 쉬고 계속 받는다. 그 밖의 예외는 로비 큐를 멈춘 뒤 위로 던져 프로세스를 종료한다. (Task 5 리뷰 후 결정)
+- 서버 로그는 `server/Log.cs` 하나로, 형식은 `yyyy-MM-dd HH:mm:ss.fff [LEVEL] category message`, 출력은 표준 출력이다. (Task 5 리뷰 후 결정)
+
+> **주의:** 아래 작업별 코드 블록은 작성 당시의 계획이다. 위 결정들로 바뀐 부분(`S_LoginResult.Ok`, `Console.WriteLine`, 테스트 개수 등)은 저장소의 실제 코드가 기준이다.
 - M1의 proto에는 로비 패킷만 넣는다. 게임 패킷(`C_Input`, `S_Snapshot`, `S_Event`, `S_Result`)은 M2 이후에 추가한다.
 
 ## 파일 구조
@@ -1499,7 +1503,14 @@ public sealed class Session
         {
             _sendQueue.Writer.TryComplete();
             _socket.Close();
-            try { await sendTask; } catch { /* 소켓을 닫았으므로 남은 송신 실패는 무시 */ }
+            try
+            {
+                await sendTask;
+            }
+            catch (Exception e) when (e is SocketException or ObjectDisposedException or OperationCanceledException)
+            {
+                // 소켓을 방금 닫았으므로 남아 있던 송신이 이 예외들로 끝나는 것은 정상이다
+            }
         }
     }
 
@@ -1809,7 +1820,7 @@ git commit -m "feat(bot): add bot scenario that creates, joins and starts a room
 
 ## M1 완료 기준
 
-- `dotnet test server.tests` 전체 통과 (42개)
+- `dotnet test server.tests` 전체 통과 (결정 변경과 리뷰 수정을 반영해 최종 49개)
 - 서버를 켠 상태에서 `dotnet run --project tools/bot -- 127.0.0.1 7777 4`가 `OK: ...`를 출력
 - `shared/` 안에 bin/obj가 없음 (`ls shared` → `Generated  Net  Shared.csproj`)
 
@@ -1818,3 +1829,21 @@ git commit -m "feat(bot): add bot scenario that creates, joins and starts a room
 - 방 틱 루프, 게임 패킷(`C_Input`, `S_Snapshot`, `S_Event`, `S_Result`), 결과 화면 후 대기실 복귀와 준비 초기화
 - Unity 클라이언트와 `shared/`의 Unity 패키지화(`package.json`, asmdef)
 - AWS 배포, systemd, SIGTERM 처리
+
+## M1 리뷰에서 M2로 넘긴 항목
+
+**공개 배포(포트 7777 개방) 전에 반드시 처리**
+- **끊긴 상대 감지**: 와이파이 끊김이나 절전처럼 FIN/RST 없이 사라진 클라이언트는 `ReceiveAsync`가 끝나지 않아 닉네임과 방 슬롯을 계속 차지한다. 접속 시 TCP keepalive(예: 10초/2초/3회)를 켜고, 10초 안에 로그인하지 않은 세션은 닫는다.
+- **큐 크기 제한**: 세션 송신 큐와 잡 큐가 무제한이라, 응답을 읽지 않고 요청만 보내는 클라이언트가 서버 메모리를 키울 수 있다. 송신 채널에 상한을 두고 넘으면 세션을 닫는다. 세션별 초당 수신 패킷 수에도 상한을 둔다.
+- **최대 동시 접속 수**, **SIGTERM 정상 종료**(세션 종료까지 기다리기).
+
+**M2 구조 변경과 함께 처리**
+- **방 스레드 분리**: 지금은 모든 패킷이 로비 큐로 간다. 방에 틱 루프가 생기면 세션마다 "보낼 큐"를 바꿀 수 있게 하고, 게임 중인 방은 방 루프로 넘겨 로비가 더 이상 건드리지 않게 한다. 게임 중 나가기와 끊김은 방 큐로 보낸다.
+- **상태별 허용 패킷 표**: 설계 2-1절대로 현재 상태에서 허용되지 않는 패킷(클라이언트가 보낸 `S_*` 포함)은 파싱 전에 버린다.
+- 정상 종료 시 세션마다 WARN "closed by error"가 찍히는 문제. 클라이언트가 강제 종료한 경우(RST)를 WARN으로 볼지 INFO로 볼지 함께 정한다.
+- 테스트 서버를 루프백 주소에만 바인딩하는 옵션 (Windows 방화벽 창 방지).
+- 게임 시작 후 로비 명령이 막히는지 테스트 (방 라우팅이 바뀐 뒤 작성).
+- `PacketRegistry` 완전성 테스트: proto의 모든 메시지(`Slot` 제외)가 등록돼 있는지 확인. 4096바이트 패킷 왕복 테스트.
+- 닉네임의 제어 문자와 보이지 않는 문자(`char.IsControl`, `UnicodeCategory.Format`) 거절. Unity 닉네임 표시에서 rich text 끄기.
+- 봇이 대기 중 `S_Error`를 받으면 시간 초과를 기다리지 않고 바로 실패하기.
+- (선택) `S_Error`에 거절된 요청의 패킷 ID를 담아 클라이언트 팝업이 "무엇이 거절됐는지" 보여 주기. 클라이언트는 모르는 `ErrorCode` 값에 대비한 기본 메시지를 둔다.
