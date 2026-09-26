@@ -1,14 +1,12 @@
 # M1: 로비 서버 구현 계획
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** TCP로 접속한 클라이언트가 로그인하고, 방을 만들거나 방 코드로 참가하고, 클래스를 골라 준비한 뒤 방장이 게임을 시작할 수 있는 C# 로비 서버와, 이를 자동으로 검증하는 봇을 만든다.
 
 **Architecture:** `proto/packets.proto`에서 Protobuf C# 코드를 생성해 `shared/`(.NET Standard 2.1)에 두고, 패킷 조립(길이 헤더)과 패킷 ID 표도 `shared/`에 둔다. 서버는 세션마다 async 수신 루프와 송신 큐를 두고, 받은 패킷을 로비 잡 큐에 넣는다. 로비 규칙(`LobbyService`)은 잡 큐 한 흐름에서만 실행되므로 락이 없고, 소켓 없이 단위 테스트한다.
 
 **Tech Stack:** .NET 10 SDK(10.0.400), C#, `System.Net.Sockets`, `System.Threading.Channels`, Google.Protobuf 3.36.2, Grpc.Tools 2.84.0(protoc 코드 생성만), xUnit 2.9.3
 
-**설계 문서:** `docs/superpowers/specs/2026-09-26-coop-dungeon-design.md` (2절, 2-1절, 4-1절, 4-2절, 4-3절, 5절)
+**설계 문서:** `docs/specs/2026-09-26-coop-dungeon-design.md` (2절, 2-1절, 4-1절, 4-2절, 4-3절, 5절)
 
 ## Global Constraints
 
