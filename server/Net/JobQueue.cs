@@ -22,7 +22,7 @@ public sealed class JobQueue
                 }
                 catch (Exception e)
                 {
-                    Console.Error.WriteLine($"[job] {e}");
+                    Log.Error("job", e.ToString());
                 }
             }
         }

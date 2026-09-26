@@ -60,17 +60,17 @@ public sealed class LobbyService
         var nickname = rawNickname.Trim();
         if (nickname.Length < 2 || nickname.Length > 12)
         {
-            _send(sessionId, new S_LoginResult { Ok = false, Error = ErrorCode.NicknameInvalid });
+            Error(sessionId, ErrorCode.NicknameInvalid);
             return;
         }
         // ponytail: 접속자 전체 선형 탐색. 동시 접속이 수천 명이 되면 HashSet으로 바꾼다.
         if (_players.Values.Any(p => p.Nickname == nickname))
         {
-            _send(sessionId, new S_LoginResult { Ok = false, Error = ErrorCode.NicknameTaken });
+            Error(sessionId, ErrorCode.NicknameTaken);
             return;
         }
         _players[sessionId] = new Player { Id = sessionId, Nickname = nickname };
-        _send(sessionId, new S_LoginResult { Ok = true, PlayerId = sessionId });
+        _send(sessionId, new S_LoginResult { PlayerId = sessionId });
     }
 
     void CreateRoom(Player player)

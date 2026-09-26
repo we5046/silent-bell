@@ -1,3 +1,4 @@
+using SilentBell.Server;
 using SilentBell.Server.Net;
 
 int port = args.Length > 0 ? int.Parse(args[0]) : 7777;
@@ -11,5 +12,5 @@ Console.CancelKeyPress += (_, e) =>
 
 var server = new GameServer(port);
 server.Start();
-Console.WriteLine($"silent-bell server listening on {server.Port}");
+Log.Info("server", $"listening on {server.Port}");
 await server.RunAsync(cts.Token);

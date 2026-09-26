@@ -25,38 +25,37 @@ namespace SilentBell.Protocol {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cg1wYWNrZXRzLnByb3RvIhsKB0NfTG9naW4SEAoIbmlja25hbWUYASABKAki",
-            "SQoNU19Mb2dpblJlc3VsdBIKCgJvaxgBIAEoCBIRCglwbGF5ZXJfaWQYAiAB",
-            "KAUSGQoFZXJyb3IYAyABKA4yCi5FcnJvckNvZGUiDgoMQ19DcmVhdGVSb29t",
-            "IhoKCkNfSm9pblJvb20SDAoEY29kZRgBIAEoCSINCgtDX0xlYXZlUm9vbSJz",
-            "CgRTbG90EhEKCXBsYXllcl9pZBgBIAEoBRIQCghuaWNrbmFtZRgCIAEoCRIe",
-            "CgpjbGFzc190eXBlGAMgASgOMgouQ2xhc3NUeXBlEhcKBmdlbmRlchgEIAEo",
-            "DjIHLkdlbmRlchINCgVyZWFkeRgFIAEoCCJCCgtTX1Jvb21TdGF0ZRIMCgRj",
-            "b2RlGAEgASgJEg8KB2hvc3RfaWQYAiABKAUSFAoFc2xvdHMYAyADKAsyBS5T",
-            "bG90IiMKB1NfRXJyb3ISGAoEY29kZRgBIAEoDjIKLkVycm9yQ29kZSJGCgtD",
-            "X1BpY2tDbGFzcxIeCgpjbGFzc190eXBlGAEgASgOMgouQ2xhc3NUeXBlEhcK",
-            "BmdlbmRlchgCIAEoDjIHLkdlbmRlciIYCgdDX1JlYWR5Eg0KBXJlYWR5GAEg",
-            "ASgIIg0KC0NfU3RhcnRHYW1lIg0KC1NfR2FtZVN0YXJ0KnkKCUNsYXNzVHlw",
-            "ZRITCg9DTEFTU19UWVBFX05PTkUQABIWChJDTEFTU19UWVBFX1dBUlJJT1IQ",
-            "ARITCg9DTEFTU19UWVBFX01BR0UQAhIVChFDTEFTU19UWVBFX0FSQ0hFUhAD",
-            "EhMKD0NMQVNTX1RZUEVfQkFSRBAEKiwKBkdlbmRlchIPCgtHRU5ERVJfTUFM",
-            "RRAAEhEKDUdFTkRFUl9GRU1BTEUQASruAwoJRXJyb3JDb2RlEhMKD0VSUk9S",
-            "X0NPREVfTk9ORRAAEh8KG0VSUk9SX0NPREVfTklDS05BTUVfSU5WQUxJRBAB",
-            "Eh0KGUVSUk9SX0NPREVfTklDS05BTUVfVEFLRU4QAhIcChhFUlJPUl9DT0RF",
-            "X05PVF9MT0dHRURfSU4QAxIgChxFUlJPUl9DT0RFX0FMUkVBRFlfTE9HR0VE",
-            "X0lOEAQSHQoZRVJST1JfQ09ERV9ST09NX05PVF9GT1VORBAFEhgKFEVSUk9S",
-            "X0NPREVfUk9PTV9GVUxMEAYSGwoXRVJST1JfQ09ERV9ST09NX0lOX0dBTUUQ",
-            "BxIeChpFUlJPUl9DT0RFX0FMUkVBRFlfSU5fUk9PTRAIEhoKFkVSUk9SX0NP",
-            "REVfTk9UX0lOX1JPT00QCRIeChpFUlJPUl9DT0RFX0lOVkFMSURfUkVRVUVT",
-            "VBAKEhoKFkVSUk9SX0NPREVfQ0xBU1NfVEFLRU4QCxIfChtFUlJPUl9DT0RF",
-            "X0NMQVNTX05PVF9QSUNLRUQQDBIXChNFUlJPUl9DT0RFX05PVF9IT1NUEA0S",
-            "JgoiRVJST1JfQ09ERV9TVEFSVF9DT05ESVRJT05fTk9UX01FVBAOEhwKGEVS",
-            "Uk9SX0NPREVfQUxSRUFEWV9SRUFEWRAPQhaqAhNTaWxlbnRCZWxsLlByb3Rv",
-            "Y29sYgZwcm90bzM="));
+            "OQoNU19Mb2dpblJlc3VsdBIRCglwbGF5ZXJfaWQYAiABKAVKBAgBEAJKBAgD",
+            "EARSAm9rUgVlcnJvciIOCgxDX0NyZWF0ZVJvb20iGgoKQ19Kb2luUm9vbRIM",
+            "CgRjb2RlGAEgASgJIg0KC0NfTGVhdmVSb29tInMKBFNsb3QSEQoJcGxheWVy",
+            "X2lkGAEgASgFEhAKCG5pY2tuYW1lGAIgASgJEh4KCmNsYXNzX3R5cGUYAyAB",
+            "KA4yCi5DbGFzc1R5cGUSFwoGZ2VuZGVyGAQgASgOMgcuR2VuZGVyEg0KBXJl",
+            "YWR5GAUgASgIIkIKC1NfUm9vbVN0YXRlEgwKBGNvZGUYASABKAkSDwoHaG9z",
+            "dF9pZBgCIAEoBRIUCgVzbG90cxgDIAMoCzIFLlNsb3QiIwoHU19FcnJvchIY",
+            "CgRjb2RlGAEgASgOMgouRXJyb3JDb2RlIkYKC0NfUGlja0NsYXNzEh4KCmNs",
+            "YXNzX3R5cGUYASABKA4yCi5DbGFzc1R5cGUSFwoGZ2VuZGVyGAIgASgOMgcu",
+            "R2VuZGVyIhgKB0NfUmVhZHkSDQoFcmVhZHkYASABKAgiDQoLQ19TdGFydEdh",
+            "bWUiDQoLU19HYW1lU3RhcnQqeQoJQ2xhc3NUeXBlEhMKD0NMQVNTX1RZUEVf",
+            "Tk9ORRAAEhYKEkNMQVNTX1RZUEVfV0FSUklPUhABEhMKD0NMQVNTX1RZUEVf",
+            "TUFHRRACEhUKEUNMQVNTX1RZUEVfQVJDSEVSEAMSEwoPQ0xBU1NfVFlQRV9C",
+            "QVJEEAQqLAoGR2VuZGVyEg8KC0dFTkRFUl9NQUxFEAASEQoNR0VOREVSX0ZF",
+            "TUFMRRABKu4DCglFcnJvckNvZGUSEwoPRVJST1JfQ09ERV9OT05FEAASHwob",
+            "RVJST1JfQ09ERV9OSUNLTkFNRV9JTlZBTElEEAESHQoZRVJST1JfQ09ERV9O",
+            "SUNLTkFNRV9UQUtFThACEhwKGEVSUk9SX0NPREVfTk9UX0xPR0dFRF9JThAD",
+            "EiAKHEVSUk9SX0NPREVfQUxSRUFEWV9MT0dHRURfSU4QBBIdChlFUlJPUl9D",
+            "T0RFX1JPT01fTk9UX0ZPVU5EEAUSGAoURVJST1JfQ09ERV9ST09NX0ZVTEwQ",
+            "BhIbChdFUlJPUl9DT0RFX1JPT01fSU5fR0FNRRAHEh4KGkVSUk9SX0NPREVf",
+            "QUxSRUFEWV9JTl9ST09NEAgSGgoWRVJST1JfQ09ERV9OT1RfSU5fUk9PTRAJ",
+            "Eh4KGkVSUk9SX0NPREVfSU5WQUxJRF9SRVFVRVNUEAoSGgoWRVJST1JfQ09E",
+            "RV9DTEFTU19UQUtFThALEh8KG0VSUk9SX0NPREVfQ0xBU1NfTk9UX1BJQ0tF",
+            "RBAMEhcKE0VSUk9SX0NPREVfTk9UX0hPU1QQDRImCiJFUlJPUl9DT0RFX1NU",
+            "QVJUX0NPTkRJVElPTl9OT1RfTUVUEA4SHAoYRVJST1JfQ09ERV9BTFJFQURZ",
+            "X1JFQURZEA9CFqoCE1NpbGVudEJlbGwuUHJvdG9jb2xiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SilentBell.Protocol.ClassType), typeof(global::SilentBell.Protocol.Gender), typeof(global::SilentBell.Protocol.ErrorCode), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::SilentBell.Protocol.C_Login), global::SilentBell.Protocol.C_Login.Parser, new[]{ "Nickname" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SilentBell.Protocol.S_LoginResult), global::SilentBell.Protocol.S_LoginResult.Parser, new[]{ "Ok", "PlayerId", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SilentBell.Protocol.S_LoginResult), global::SilentBell.Protocol.S_LoginResult.Parser, new[]{ "PlayerId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SilentBell.Protocol.C_CreateRoom), global::SilentBell.Protocol.C_CreateRoom.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SilentBell.Protocol.C_JoinRoom), global::SilentBell.Protocol.C_JoinRoom.Parser, new[]{ "Code" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SilentBell.Protocol.C_LeaveRoom), global::SilentBell.Protocol.C_LeaveRoom.Parser, null, null, null, null, null),
@@ -306,6 +305,9 @@ namespace SilentBell.Protocol {
 
   }
 
+  /// <summary>
+  /// 로그인 성공 시에만 보낸다. 실패는 S_Error로 보낸다.
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class S_LoginResult : pb::IMessage<S_LoginResult>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -341,9 +343,7 @@ namespace SilentBell.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public S_LoginResult(S_LoginResult other) : this() {
-      ok_ = other.ok_;
       playerId_ = other.playerId_;
-      error_ = other.error_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -351,18 +351,6 @@ namespace SilentBell.Protocol {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public S_LoginResult Clone() {
       return new S_LoginResult(this);
-    }
-
-    /// <summary>Field number for the "ok" field.</summary>
-    public const int OkFieldNumber = 1;
-    private bool ok_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Ok {
-      get { return ok_; }
-      set {
-        ok_ = value;
-      }
     }
 
     /// <summary>Field number for the "player_id" field.</summary>
@@ -374,18 +362,6 @@ namespace SilentBell.Protocol {
       get { return playerId_; }
       set {
         playerId_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "error" field.</summary>
-    public const int ErrorFieldNumber = 3;
-    private global::SilentBell.Protocol.ErrorCode error_ = global::SilentBell.Protocol.ErrorCode.None;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::SilentBell.Protocol.ErrorCode Error {
-      get { return error_; }
-      set {
-        error_ = value;
       }
     }
 
@@ -404,9 +380,7 @@ namespace SilentBell.Protocol {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Ok != other.Ok) return false;
       if (PlayerId != other.PlayerId) return false;
-      if (Error != other.Error) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -414,9 +388,7 @@ namespace SilentBell.Protocol {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Ok != false) hash ^= Ok.GetHashCode();
       if (PlayerId != 0) hash ^= PlayerId.GetHashCode();
-      if (Error != global::SilentBell.Protocol.ErrorCode.None) hash ^= Error.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -435,17 +407,9 @@ namespace SilentBell.Protocol {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Ok != false) {
-        output.WriteRawTag(8);
-        output.WriteBool(Ok);
-      }
       if (PlayerId != 0) {
         output.WriteRawTag(16);
         output.WriteInt32(PlayerId);
-      }
-      if (Error != global::SilentBell.Protocol.ErrorCode.None) {
-        output.WriteRawTag(24);
-        output.WriteEnum((int) Error);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -457,17 +421,9 @@ namespace SilentBell.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Ok != false) {
-        output.WriteRawTag(8);
-        output.WriteBool(Ok);
-      }
       if (PlayerId != 0) {
         output.WriteRawTag(16);
         output.WriteInt32(PlayerId);
-      }
-      if (Error != global::SilentBell.Protocol.ErrorCode.None) {
-        output.WriteRawTag(24);
-        output.WriteEnum((int) Error);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -479,14 +435,8 @@ namespace SilentBell.Protocol {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Ok != false) {
-        size += 1 + 1;
-      }
       if (PlayerId != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(PlayerId);
-      }
-      if (Error != global::SilentBell.Protocol.ErrorCode.None) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -500,14 +450,8 @@ namespace SilentBell.Protocol {
       if (other == null) {
         return;
       }
-      if (other.Ok != false) {
-        Ok = other.Ok;
-      }
       if (other.PlayerId != 0) {
         PlayerId = other.PlayerId;
-      }
-      if (other.Error != global::SilentBell.Protocol.ErrorCode.None) {
-        Error = other.Error;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -528,16 +472,8 @@ namespace SilentBell.Protocol {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Ok = input.ReadBool();
-            break;
-          }
           case 16: {
             PlayerId = input.ReadInt32();
-            break;
-          }
-          case 24: {
-            Error = (global::SilentBell.Protocol.ErrorCode) input.ReadEnum();
             break;
           }
         }
@@ -559,16 +495,8 @@ namespace SilentBell.Protocol {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            Ok = input.ReadBool();
-            break;
-          }
           case 16: {
             PlayerId = input.ReadInt32();
-            break;
-          }
-          case 24: {
-            Error = (global::SilentBell.Protocol.ErrorCode) input.ReadEnum();
             break;
           }
         }

@@ -27,25 +27,40 @@ public sealed class GameServer
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var lobbyTask = _lobbyQueue.RunAsync(ct);
+        // 로비는 ct 외에도 서버가 직접 멈출 수 있어야 한다. 그래야 accept 루프가 어떤 이유로 끝나도 finally에서 기다리다 멈추지 않는다.
+        using var lobbyCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var lobbyTask = _lobbyQueue.RunAsync(lobbyCts.Token);
         try
         {
             while (true)
             {
-                var socket = await _listener.AcceptSocketAsync(ct);
+                Socket socket;
+                try
+                {
+                    socket = await _listener.AcceptSocketAsync(ct);
+                }
+                catch (SocketException e)
+                {
+                    // 접속 하나의 실패(연결 도중 끊김, 핸들 고갈 등). 기록하고 다음 접속을 계속 받는다.
+                    Log.Warn("accept", $"{e.SocketErrorCode} {e.Message}");
+                    await Task.Delay(100, ct); // 계속 실패하는 경우 로그 폭주를 막는다
+                    continue;
+                }
                 socket.NoDelay = true; // 작은 패킷을 모아 늦게 보내는 Nagle 알고리즘을 끈다
                 var session = new Session(Interlocked.Increment(ref _nextSessionId), socket);
                 _sessions[session.Id] = session;
-                Console.WriteLine($"[session {session.Id}] connected {socket.RemoteEndPoint}");
+                Log.Info("session", $"{session.Id} connected {socket.RemoteEndPoint}");
                 _ = RunSessionAsync(session, ct);
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
+            // 정상 종료
         }
         finally
         {
             _listener.Stop();
+            lobbyCts.Cancel();
             await lobbyTask;
         }
     }
@@ -55,6 +70,7 @@ public sealed class GameServer
         await session.RunAsync((s, message) => _lobbyQueue.Push(() => _lobby.Handle(s.Id, message)), ct);
         _sessions.TryRemove(session.Id, out _);
         _lobbyQueue.Push(() => _lobby.OnDisconnect(session.Id));
+        Log.Info("session", $"{session.Id} disconnected");
     }
 
     void SendTo(int sessionId, IMessage message)

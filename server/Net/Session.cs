@@ -35,7 +35,7 @@ public sealed class Session
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[session {Id}] closed: {e.GetType().Name} {e.Message}");
+            Log.Warn("session", $"{Id} closed by error: {e.GetType().Name} {e.Message}");
         }
         finally
         {

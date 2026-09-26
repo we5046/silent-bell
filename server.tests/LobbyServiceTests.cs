@@ -37,9 +37,8 @@ public class LobbyServiceTests
     public void Login_succeeds_with_trimmed_nickname()
     {
         Login(1, "  로엔  ");
-        var result = Last<S_LoginResult>(1);
-        Assert.True(result.Ok);
-        Assert.Equal(1, result.PlayerId);
+        Assert.Equal(1, Last<S_LoginResult>(1).PlayerId);
+        Assert.DoesNotContain(_sent, s => s.To == 1 && s.Message is S_Error);
     }
 
     [Theory]
@@ -49,9 +48,17 @@ public class LobbyServiceTests
     public void Login_rejects_invalid_nickname_length(string nickname)
     {
         Login(1, nickname);
-        var result = Last<S_LoginResult>(1);
-        Assert.False(result.Ok);
-        Assert.Equal(ErrorCode.NicknameInvalid, result.Error);
+        Assert.Equal(ErrorCode.NicknameInvalid, Last<S_Error>(1).Code);
+        Assert.DoesNotContain(_sent, s => s.To == 1 && s.Message is S_LoginResult);
+    }
+
+    [Theory]
+    [InlineData("ab")]
+    [InlineData("123456789012")]
+    public void Login_accepts_boundary_nickname_length(string nickname)
+    {
+        Login(1, nickname);
+        Assert.Equal(1, Last<S_LoginResult>(1).PlayerId);
     }
 
     [Fact]
@@ -59,7 +66,7 @@ public class LobbyServiceTests
     {
         Login(1, "로엔");
         Login(2, "로엔");
-        Assert.Equal(ErrorCode.NicknameTaken, Last<S_LoginResult>(2).Error);
+        Assert.Equal(ErrorCode.NicknameTaken, Last<S_Error>(2).Code);
     }
 
     [Fact]
@@ -160,7 +167,7 @@ public class LobbyServiceTests
 
         Assert.Equal(new[] { 2 }, Last<S_RoomState>(2).Slots.Select(s => s.PlayerId));
         Login(3, "player1");
-        Assert.True(Last<S_LoginResult>(3).Ok);
+        Assert.Equal(3, Last<S_LoginResult>(3).PlayerId);
     }
 
     void Pick(int id, ClassType classType, Gender gender = Gender.Male) =>

@@ -30,9 +30,9 @@ public class GameServerTests : IAsyncLifetime
         using var guest = await BotConnection.ConnectAsync("127.0.0.1", _server.Port);
 
         await host.SendAsync(new C_Login { Nickname = "host" });
-        Assert.True((await host.ReceiveAsync<S_LoginResult>()).Ok);
+        await host.ReceiveAsync<S_LoginResult>();
         await guest.SendAsync(new C_Login { Nickname = "guest" });
-        Assert.True((await guest.ReceiveAsync<S_LoginResult>()).Ok);
+        await guest.ReceiveAsync<S_LoginResult>();
 
         await host.SendAsync(new C_CreateRoom());
         var code = (await host.ReceiveAsync<S_RoomState>()).Code;
@@ -48,5 +48,14 @@ public class GameServerTests : IAsyncLifetime
         using var bot = await BotConnection.ConnectAsync("127.0.0.1", _server.Port);
         await bot.SendRawAsync(new byte[] { 0x02, 0x00, 0x01, 0x00 }); // 길이 2 < 최소 4
         await Assert.ThrowsAsync<IOException>(() => bot.ReceiveAsync<S_Error>());
+    }
+
+    [Fact]
+    public async Task RunAsync_surfaces_unexpected_accept_failure_instead_of_hanging()
+    {
+        var notStarted = new GameServer(0);
+        using var cts = new CancellationTokenSource();
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => notStarted.RunAsync(cts.Token).WaitAsync(TimeSpan.FromSeconds(3)));
     }
 }
