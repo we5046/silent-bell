@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\shared\Shared.csproj" />
     <ProjectReference Include="..\server\Server.csproj" />
+    <ProjectReference Include="..\tools\bot\Bot.csproj" />
   </ItemGroup>
 
 </Project>

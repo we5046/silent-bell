@@ -8,4 +8,8 @@
   <Folder Name="/shared/">
     <Project Path="shared/Shared.csproj" />
   </Folder>
+  <Folder Name="/tools/" />
+  <Folder Name="/tools/bot/">
+    <Project Path="tools/bot/Bot.csproj" />
+  </Folder>
 </Solution>
